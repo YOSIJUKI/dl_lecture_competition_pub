@@ -1,5 +1,5 @@
 batch_size: 512
-epochs: 80
+epochs: 300
 lr: 0.001
 
 device: cuda:0
