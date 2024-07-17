@@ -1,0 +1,44 @@
+Traceback (most recent call last):
+  File "/home/user6/project/deep_learning_courses/dl_lecture_competition_pub/main.py", line 3, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+wandb: Currently logged in as: shirasaki0920 (shirasaki0920-Tokyo University of Science). Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.17.4 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.0
+wandb: Run data is saved locally in /home/user6/project/deep_learning_courses/dl_lecture_competition_pub/outputs/2024-07-17/04-50-28/wandb/run-20240717_045030-s0bpluqi
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run sandy-violet-10
+wandb: ⭐️ View project at https://wandb.ai/shirasaki0920-Tokyo%20University%20of%20Science/MEG-classification
+wandb: 🚀 View run at https://wandb.ai/shirasaki0920-Tokyo%20University%20of%20Science/MEG-classification/runs/s0bpluqi
+Epoch 1/80
+Train:   0%|          | 0/129 [00:00<?, ?it/s]Train:   0%|          | 0/129 [00:01<?, ?it/s]
+Error executing job with overrides: ['use_wandb=True']
+Traceback (most recent call last):
+  File "/home/user6/project/deep_learning_courses/dl_lecture_competition_pub/main.py", line 68, in run
+    y_pred = model(X) # モデルに入力データを渡し、予測値 (y_pred) を取得します。
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user6/project/deep_learning_courses/dl_lecture_competition_pub/src/models.py", line 35, in forward
+    X = self.blocks(X)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/container.py", line 217, in forward
+    input = module(input)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user6/project/deep_learning_courses/dl_lecture_competition_pub/src/models.py", line 66, in forward
+    X = self.conv0(X)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 313, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/user6/anaconda3/envs/dlbasics/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 309, in _conv_forward
+    return F.conv1d(input, weight, bias, self.stride,
+RuntimeError: Input type (torch.cuda.DoubleTensor) and weight type (torch.cuda.FloatTensor) should be the same
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: 🚀 View run sandy-violet-10 at: https://wandb.ai/shirasaki0920-Tokyo%20University%20of%20Science/MEG-classification/runs/s0bpluqi
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./outputs/2024-07-17/04-50-28/wandb/run-20240717_045030-s0bpluqi/logs

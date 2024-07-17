@@ -27,11 +27,11 @@ def run(args: DictConfig):
     # ------------------
     loader_args = {"batch_size": args.batch_size, "num_workers": args.num_workers}
     
-    train_set = ThingsMEGDataset("train", args.data_dir)
+    train_set = ThingsMEGDataset("train", args.data_dir, preprocess=True, original_sampling_rate=1000)
     train_loader = torch.utils.data.DataLoader(train_set, shuffle=True, **loader_args)
-    val_set = ThingsMEGDataset("val", args.data_dir)
+    val_set = ThingsMEGDataset("val", args.data_dir, preprocess=True, original_sampling_rate=1000)
     val_loader = torch.utils.data.DataLoader(val_set, shuffle=False, **loader_args)
-    test_set = ThingsMEGDataset("test", args.data_dir)
+    test_set = ThingsMEGDataset("test", args.data_dir, preprocess=True, original_sampling_rate=1000)
     test_loader = torch.utils.data.DataLoader(
         test_set, shuffle=False, batch_size=args.batch_size, num_workers=args.num_workers
     )
@@ -40,13 +40,13 @@ def run(args: DictConfig):
     #       Model
     # ------------------
     model = BasicConvClassifier(
-        train_set.num_classes, train_set.seq_len, train_set.num_channels
+        train_set.num_classes, train_set.seq_len, train_set.num_channels, len(train_set.subject_idxs.unique())
     ).to(args.device)
 
     # ------------------
     #     Optimizer
     # ------------------
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)  # weight_decayでL2正則化を適用
 
     # ------------------
     #   Start training
@@ -63,9 +63,9 @@ def run(args: DictConfig):
         
         model.train()
         for X, y, subject_idxs in tqdm(train_loader, desc="Train"):
-            X, y = X.to(args.device), y.to(args.device)
+            X, y, subject_idxs = X.to(args.device), y.to(args.device), subject_idxs.to(args.device)
 
-            y_pred = model(X)
+            y_pred = model(X, subject_idxs)
             
             loss = F.cross_entropy(y_pred, y)
             train_loss.append(loss.item())
@@ -79,10 +79,10 @@ def run(args: DictConfig):
 
         model.eval()
         for X, y, subject_idxs in tqdm(val_loader, desc="Validation"):
-            X, y = X.to(args.device), y.to(args.device)
+            X, y, subject_idxs = X.to(args.device), y.to(args.device), subject_idxs.to(args.device)
             
             with torch.no_grad():
-                y_pred = model(X)
+                y_pred = model(X, subject_idxs)
             
             val_loss.append(F.cross_entropy(y_pred, y).item())
             val_acc.append(accuracy(y_pred, y).item())
@@ -105,8 +105,8 @@ def run(args: DictConfig):
 
     preds = [] 
     model.eval()
-    for X, subject_idxs in tqdm(test_loader, desc="Validation"):        
-        preds.append(model(X.to(args.device)).detach().cpu())
+    for X, subject_idxs in tqdm(test_loader, desc="Validation"):
+        preds.append(model(X.to(args.device), subject_idxs.to(args.device)).detach().cpu())
         
     preds = torch.cat(preds, dim=0).numpy()
     np.save(os.path.join(logdir, "submission"), preds)

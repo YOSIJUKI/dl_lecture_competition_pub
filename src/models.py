@@ -10,12 +10,14 @@ class BasicConvClassifier(nn.Module):
         num_classes: int,
         seq_len: int,
         in_channels: int,
+        num_subjects: int,
         hid_dim: int = 128
     ) -> None:
         super().__init__()
+        self.subject_embedding = nn.Embedding(num_subjects, hid_dim)
 
         self.blocks = nn.Sequential(
-            ConvBlock(in_channels, hid_dim),
+            ConvBlock(in_channels + hid_dim, hid_dim),
             ConvBlock(hid_dim, hid_dim),
         )
 
@@ -25,13 +27,16 @@ class BasicConvClassifier(nn.Module):
             nn.Linear(hid_dim, num_classes),
         )
 
-    def forward(self, X: torch.Tensor) -> torch.Tensor:
+    def forward(self, X: torch.Tensor, subject_idxs: torch.Tensor) -> torch.Tensor:
         """_summary_
         Args:
             X ( b, c, t ): _description_
+            subject_idxs ( b ): _description_
         Returns:
             X ( b, num_classes ): _description_
         """
+        subject_embeds = self.subject_embedding(subject_idxs).unsqueeze(-1).expand(-1, -1, X.shape[2])
+        X = torch.cat([X, subject_embeds], dim=1)
         X = self.blocks(X)
 
         return self.head(X)
@@ -43,7 +48,7 @@ class ConvBlock(nn.Module):
         in_dim,
         out_dim,
         kernel_size: int = 3,
-        p_drop: float = 0.1,
+        p_drop: float = 0.5,
     ) -> None:
         super().__init__()
         
